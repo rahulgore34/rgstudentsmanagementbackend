@@ -1,0 +1,23 @@
+{
+    "personalInfo": {
+        "firstName": "shlok",
+        "middleName": "rahul",
+        "lastName": "gore",
+        "motherName": "sarita"
+    },
+    "address": {
+        "street": "panchnath",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "pincode": "41101"
+    },
+    "communication": {
+        "email": "test@test.com",
+        "phone": "1234567890"
+    },
+    "studentInfo": {
+        "standard": "5",
+        "div": "A",
+        "batch": 2024
+    }
+}
