@@ -135,3 +135,13 @@ exports.addRollNumberCtrl = async (req, res, next) => {
         next()
     }
 }
+
+exports.verifyEmailStudent = async(req, res, next) => {
+  
+    res.json({
+        status: 200,
+        data: {
+            message: "OTP sent to "+req.body.email
+        }
+    })
+}

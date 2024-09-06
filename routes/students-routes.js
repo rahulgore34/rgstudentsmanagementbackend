@@ -1,7 +1,7 @@
 const express = require("express");
 const {getAllStudents, getByRollNo, createStudent, 
     patchStudent, deletStudent, checkRollNo,
-    addRollNumberCtrl } = require("../controllers/student-ctrl");
+    addRollNumberCtrl, verifyEmailStudent } = require("../controllers/student-ctrl");
 
 
 
@@ -28,6 +28,9 @@ router.route("/:id")
 .patch(patchStudent)
 .delete(deletStudent)
 
+
+router.route("/verify-email")
+.post(verifyEmailStudent);
 // router.route("/:rollno/:name/:city?")
 // .get(getByRollNo)
 

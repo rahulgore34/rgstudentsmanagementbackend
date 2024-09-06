@@ -1,12 +1,19 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const path = require('path');
+
 const studentRouter = require("./routes/students-routes");
 const adminRouter = require('./routes/admin-routes');
 
+const organizeRouter = require('./routes/organizemeusers-routes');
+
+// const AdminModel = require("../models/admin-model");
 const app = express();
 // midle ware for static file
-app.use(express.static("public"));
+// app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(cors())
 //middle ware
 const custumMidlewareLogger = function(req, res, next) {
@@ -32,6 +39,8 @@ if(process.env.NODE_ENV === 'development') {
 app.use("/api/v1/students",studentRouter);
 
 app.use("/api/v1/administrator", adminRouter);
+
+app.use("/api/v1/organizemeusers", organizeRouter);
 
 
 

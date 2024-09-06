@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+
 
 const adminSchema = mongoose.Schema({
     username: {
@@ -13,6 +15,20 @@ const adminSchema = mongoose.Schema({
         minlength: 8
     },
 })
+
+
+adminSchema.pre("save", async function (next) {
+//   "password": "admin@12345678"
+    console.log('isnew ', this.isNew);
+    if (this.isModified('password') || this.isNew) {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+    }
+    next();
+})
+
+
+
 
 // Create a model
 // rgschooldb  - this is db name defined in conn string.
