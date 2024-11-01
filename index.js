@@ -7,7 +7,8 @@ const studentRouter = require("./routes/students-routes");
 const adminRouter = require('./routes/admin-routes');
 
 const organizeRouter = require('./routes/organizemeusers-routes');
-
+const authenticateToken = require('./middleware/auth-middleware'); 
+const expenseRouter = require("./routes/expenses-routes");
 // const AdminModel = require("../models/admin-model");
 const app = express();
 // midle ware for static file
@@ -24,13 +25,6 @@ const custumMidlewareLogger = function(req, res, next) {
 app.use(express.json()) //middleware to add  req body
 app.use(custumMidlewareLogger); //middleware
 
-// Middleware
-// app.use((req, res, next)=> {
-//     req.requestedAt = new Date().toISOString()
-//     next();
-// })
-
-
 
 if(process.env.NODE_ENV === 'development') {
     app.use(morgan("dev")); //third party middleware
@@ -42,7 +36,7 @@ app.use("/api/v1/administrator", adminRouter);
 
 app.use("/api/v1/organizemeusers", organizeRouter);
 
-
+app.use("/api/v1/expenses", authenticateToken, expenseRouter);
 
 // In order to use app in other file
 module.exports = app;

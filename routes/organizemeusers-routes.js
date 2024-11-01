@@ -1,7 +1,7 @@
 const express = require("express");
 const OrgMeModel = require("../models/organizeme-model");
 const router = express.Router();
-
+const jwt = require("jsonwebtoken");
 const otpGenerator = require('otp-generator')
 
 router.route("/")
@@ -19,6 +19,9 @@ router.route("/orguserrequestotp")
 
 router.route("/orguserverifyotp")
     .post(verifyOrgUserOTP);
+
+    router.route("/login")
+    .post(login);
 
 
 module.exports = router;
@@ -142,4 +145,20 @@ async function verifyOrgUserOTP(req, res, next) {
 // REusable OTP generator
 function getOTP() {
     return Math.floor(10000 + Math.random() * 90000);;
+}
+
+const JWT_SECRET = 'we2can3create4bigrandomstring';
+// Login 
+async function login(req, res) {
+  try {
+    const {email} = req.body;
+    const user = await OrgMeModel.findOne({ email });
+    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+    console.log('Found user '+user);
+   // Create JWT token
+   const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '2h' });
+   res.status(200).json({ msg: "success",token });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 }
