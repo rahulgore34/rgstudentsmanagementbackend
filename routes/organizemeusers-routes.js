@@ -155,9 +155,10 @@ async function login(req, res) {
     const user = await OrgMeModel.findOne({ email });
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
     console.log('Found user '+user);
-   // Create JWT token
+    if(!user.isemailerified) return res.status(200).json({ msg: "success",isemailerified:user.isemailerified });
+   // Create JWT token if verified email is true
    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '2h' });
-   res.status(200).json({ msg: "success",token });
+   res.status(200).json({ msg: "success",token,isemailerified:user.isemailerified });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

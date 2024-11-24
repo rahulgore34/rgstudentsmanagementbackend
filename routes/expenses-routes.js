@@ -7,7 +7,10 @@ router.route("/")
     .post(addExpenses)
 
 router.route("/config")
-    .get(getExpensesConfig)
+    .get(getExpensesConfig);
+
+router.route("/bulk")
+    .post(bulkAddxxpenses);
 
 // router.route("/confidencialadminsignup")
 // .post(addAdmin);
@@ -55,6 +58,25 @@ function getExpensesConfig(req, res) {
         paymentMethods: ExpenseModel.schema.path('paymentMethod').enumValues,
         categories: ExpenseModel.schema.path('category').enumValues,
     });
+}
+
+async function bulkAddxxpenses(req, res) {
+    try {
+        const userId = req.user.userId;
+        const expenses = req.body.expenses;
+
+        // Map each expense to include the user ID
+        const expensesWithUser = expenses.map(expense => ({
+            ...expense,
+            user: userId
+        }));
+
+        // Insert multiple expenses into the database
+        const result = await ExpenseModel.insertMany(expensesWithUser);
+        res.status(201).json(result);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
 }
 
 module.exports = router;
