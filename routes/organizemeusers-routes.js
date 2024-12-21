@@ -26,21 +26,21 @@ router.route("/orguserverifyotp")
 
 module.exports = router;
 
-// Controllers
+// Controllers save user
 async function addOrganizeMeUsers(req, res, next) {
     try {
         // const newAdmin = await AdminModel.create(req.body);
         const newuser = await OrgMeModel.create(req.body);
         res.status(201).json({
-            status: 'success',
+            success: true,
             data: {
                 newuser
             }
         })
     } catch (error) {
         res.status(400).json({
-            status: 'fail',
-            message: error.message
+            success: false,
+            message: error?.message
         })
     }
 }
@@ -73,8 +73,8 @@ async function sendOrgUserOTP(req, res, next) {
         const user = await OrgMeModel.findOne({ email });
 
         if (!user) {
-            res.json({
-                status: 'F', message: "Email not exist"
+            res.status(404).json({
+                success: false, message: "Email not exist"
             })
         }
 
@@ -85,12 +85,10 @@ async function sendOrgUserOTP(req, res, next) {
         await OrgMeModel.updateOne({ email }, { otp, otpSentAt });
 
         // Here, you can integrate your email service to send the OTP to the user's email
-        console.log(`OTP for ${email} is ${otp}`); // Just for debugging, remove in production
         res.json({
-            status: 'P', message: "OTP sent successfully!!", otp: otp
+            success: true, message: "OTP sent successfully!!",  otp, otpSentAt
         })
     } catch (error) {
-        console.error('Error sending OTP:', error);
         res.status(400).json({
             status: 'fail',
             message: error.message
@@ -106,28 +104,28 @@ async function verifyOrgUserOTP(req, res, next) {
         // Find the user by email
         const user = await OrgMeModel.findOne({ email });
         if (!user) {
-            return res.json({
-                status: 'F', message: "Email not exist"
+            return res.status(404).json({
+                success: false, message: "Email not exist"
             })
         }
         // Check if the OTP is expired
         const currentTime = new Date();
         const otpAge = (currentTime - user.otpSentAt) / 1000; // Age in seconds
         if (otpAge > 120) { // 120 seconds = 2 minutes
-            return res.json({
-                status: 'F', message: "otp expired..!"
+            return res.status(401).json({
+                success: false, message: "otp expired..!"
             })
         }
         // Check if the OTP matches
         if (user.otp !== otp) {
-            return res.json({
-                status: 'F', message: "Invalid OTP"
+            return res.status(401).json({
+                success: false, message: "Invalid OTP"
             })
         }
         // OTP is valid and not expired, proceed with verification
         await OrgMeModel.updateOne({ email }, { isemailerified: true, otp: null, otpSentAt: null });
-        res.json({
-            status: 'P', message: "OTP verified successfully!!"
+        res.status(200).json({
+            success: true, message: "OTP verified successfully!!"
 
         })
     } catch (error) {
@@ -147,18 +145,17 @@ function getOTP() {
     return Math.floor(10000 + Math.random() * 90000);;
 }
 
-const JWT_SECRET = 'we2can3create4bigrandomstring';
+const JWT_SECRET = process.env.JWT_SECRET;
 // Login 
 async function login(req, res) {
   try {
     const {email} = req.body;
     const user = await OrgMeModel.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
-    console.log('Found user '+user);
-    if(!user.isemailerified) return res.status(200).json({ msg: "success",isemailerified:user.isemailerified });
+    if (!user) return res.status(401).json({ message: 'user not found', success: false });
+    if(!user.isemailerified) return res.status(401).json({ success: false , message: "email not verified",isemailerified:user.isemailerified });
    // Create JWT token if verified email is true
-   const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '2h' });
-   res.status(200).json({ msg: "success",token,isemailerified:user.isemailerified });
+   const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1d' });
+   res.status(200).json({ message: "success",token,isemailerified:user.isemailerified });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

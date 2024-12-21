@@ -16,7 +16,6 @@ router.route("/bulk")
 // .post(addAdmin);
 
 async function getExpenses(req, res) {
-
     try {
         // Access the user ID from the authenticated user
         const userId = req.user.userId;
@@ -24,7 +23,13 @@ async function getExpenses(req, res) {
         // Find expenses that belong to this user
         const expenses = await ExpenseModel.find({ user: userId });
 
-        res.json(expenses);
+        res.json({
+            success: true,
+            data: {
+                totalRecords: expenses.length,
+                expenses
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch expenses' });
     }
@@ -34,10 +39,6 @@ async function addExpenses(req, res) {
     try {
         const { category, description, amount, paymentMethod } = req.body;
         const userId = req.user.userId; // Assume this is obtained from authentication
-        console.log('While adding...');
-        console.log(userId);
-
-
         const expense = new ExpenseModel({
             category,
             description,
@@ -47,9 +48,12 @@ async function addExpenses(req, res) {
         });
 
         await expense.save();
-        res.status(201).json(expense);
+        res.status(201).json({
+            success: true,
+            expense
+        });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({  success: false,message: error.message });
     }
 }
 
