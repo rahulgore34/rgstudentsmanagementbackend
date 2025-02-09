@@ -37,13 +37,13 @@ async function getExpenses(req, res) {
 
 async function addExpenses(req, res) {
     try {
-        const { category, description, amount, paymentMethod } = req.body;
+        const { category, description, amount, paymentMethod, date } = req.body;
         const userId = req.user.userId; // Assume this is obtained from authentication
         const expense = new ExpenseModel({
             category,
             description,
             amount,
-            paymentMethod,
+            paymentMethod,date,
             user: userId,
         });
 
